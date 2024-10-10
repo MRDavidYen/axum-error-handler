@@ -1,10 +1,11 @@
 [package]
 name = "axum-error-handler"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["David Ten <david99900@gmail.com>"]
 description = "A simple error handler for axum"
 license = "MIT"
+repository = "https://github.com/MRDavidYen/axum-error-handler"
 
 [lib]
 proc-macro = true
