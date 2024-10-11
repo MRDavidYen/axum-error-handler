@@ -1,6 +1,6 @@
 # Axum Error Handler
 
-A simple parser that implemented Axum `IntoReponse` trait.
+A simple parser that implemented Axum `IntoResponse` trait.
 
 > Please notice that this is a experimental project.
 > This proc-macros depends on `axum`, `thiserror` and `serde_json` crates. 
