@@ -25,7 +25,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn is_correct_body() {
+    async fn test_is_correct_body() {
         let err = TestError::AnotherNoStringError(InnerError::BadRequest("foo".to_string()));
 
         let resp = err.into_response();
@@ -38,7 +38,7 @@ mod tests {
     }
 
     #[test]
-    fn is_correct_status_code() {
+    fn test_is_correct_status_code() {
         let err = TestError::BadRequest("foo".to_string());
 
         let resp = err.into_response();
@@ -48,7 +48,7 @@ mod tests {
     }
 
     #[test]
-    fn parse_http_code() {
+    fn test_parse_http_code() {
         let status_code = StatusCode::from_u16(400).unwrap();
 
         assert_eq!(status_code, StatusCode::BAD_REQUEST);
