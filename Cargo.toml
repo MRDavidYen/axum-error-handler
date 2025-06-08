@@ -6,6 +6,8 @@ authors = ["David Yen <david99900@gmail.com>"]
 description = "A simple error handler for axum"
 license = "MIT"
 repository = "https://github.com/MRDavidYen/axum-error-handler"
+categories = ["web-programming", "web-frameworks", "error-handling"]
+keywords = ["axum", "error", "handler", "web", "framework"]
 
 [lib]
 proc-macro = true
