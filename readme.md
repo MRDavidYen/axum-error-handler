@@ -5,6 +5,33 @@ A simple parser that implemented Axum `IntoResponse` trait.
 > Please notice that this is a experimental project.
 > This proc-macros depends on `axum`, `thiserror` and `serde_json` crates. 
 
+## Next feature
+
+- [ ] Allow Custom function for define own output format.
+
+> This is an example:
+```rust
+#[derive(Debug, Error, AxumErrorResponse)]
+#[response(custom_fn = "your_custom_fn")]
+pub enum TestError {
+    #[error("Bad request: {0}")]
+    #[status_code("400")]
+    #[code("BAD_REQUEST")]
+    BadRequest(String),
+    
+    #[error("Internal server error {0}")]
+    #[status_code("500")]
+    #[code("INTERNAL_SERVER_ERROR")]
+    InternalError(String),
+}
+
+fn your_custom_fn(status_code: StatusCode, code: &str, msg: &str) -> Response {
+    // implement your own response format
+}
+```
+
+This feature should launch on the next version.
+
 ## Basic Usage
 
 ```rust
