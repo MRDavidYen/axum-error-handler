@@ -31,7 +31,39 @@ serde_json = "1.0"
 
 ## Usage Examples
 
-### Basic Error Responses
+#[derive(Debug, Error, AxumErrorResponse)]
+pub enum TestError {
+    #[error("Bad request: {0}")]
+    #[status_code("400")]
+    #[code("BAD_REQUEST")]
+    BadRequest(String),
+    
+    #[error("Internal server error {0}")]
+    #[status_code("500")]
+    #[code("INTERNAL_SERVER_ERROR")]
+    InternalError(String),
+}
+```
+
+This generates the following JSON response format:
+
+```json
+{
+  "result": null,
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Bad request: invalid input"
+  }
+}
+```
+
+## Advanced Usage
+
+### Nested Response Support
+
+The library supports nested error handling through the `#[response(nested)]` attribute. This allows inner errors that also implement `AxumErrorResponse` to be properly forwarded with their own status codes and error details.
+
+### Example
 
 ```rust
 use axum_error_handler::AxumErrorResponse;
@@ -116,6 +148,34 @@ pub enum CustomError {
 ```
 
 This allows you to return any response format (plain text, XML, custom JSON, etc.) instead of the standard JSON format.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Repository
+
+```json
+{
+  "result": null,
+  "error": {
+    "code": "AUTHENTICATION_ERROR",
+    "message": "Authentication error: invalid token"
+  }
+}
+```
+
+### Benefits of Nested Responses
+
+- **Status Code Preservation**: Nested errors maintain their original HTTP status codes
+- **Error Code Forwarding**: Custom error codes from inner errors are preserved
+- **Multiple Nesting Levels**: Supports arbitrarily deep error nesting
+- **Automatic Conversion**: Use `#[from]` attribute for automatic error conversion
+- **Consistent JSON Format**: All responses follow the same `{"result": null, "error": {...}}` structure
 
 ## Contributing
 
