@@ -1,9 +1,32 @@
 # Axum Error Handler
 
-A simple parser that implemented Axum `IntoResponse` trait.
+[![Crates.io](https://img.shields.io/crates/v/axum-error-handler.svg)](https://crates.io/crates/axum-error-handler)
+[![Documentation](https://docs.rs/axum-error-handler/badge.svg)](https://docs.rs/axum-error-handler)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> Please notice that this is a experimental project.
-> This proc-macros depends on `axum`, `thiserror` and `serde_json` crates. 
+A procedural macro for generating standardized error responses in Axum applications. This crate provides a derive macro that automatically implements the `IntoResponse` trait for your error enums, creating consistent JSON error responses with proper HTTP status codes.
+
+## Features
+
+- 🚀 **Easy Integration**: Simple derive macro for error enums
+- 📝 **Consistent Format**: Standardized JSON error responses
+- 🔧 **Flexible Configuration**: Custom status codes and error codes
+- 🏗️ **Nested Error Support**: Forward inner errors with preserved status codes
+- ⚡ **Zero Runtime Cost**: All code generation happens at compile time
+
+> **Note**: This is an experimental project. The API may change in future versions.
+
+## Installation
+
+Add this to your `Cargo.toml`:
+
+```toml
+[dependencies]
+axum-error-handler = "0.2.1"
+axum = "0.8"
+thiserror = "2.0"
+serde_json = "1.0"
+``` 
 
 ## Basic Usage
 
@@ -25,7 +48,7 @@ pub enum TestError {
 }
 ```
 
-### Basic Output
+This generates the following JSON response format:
 
 ```json
 {
@@ -37,7 +60,9 @@ pub enum TestError {
 }
 ```
 
-## Nested Response Support
+## Advanced Usage
+
+### Nested Response Support
 
 The library supports nested error handling through the `#[response(nested)]` attribute. This allows inner errors that also implement `AxumErrorResponse` to be properly forwarded with their own status codes and error details.
 
@@ -122,10 +147,22 @@ When using nested responses, the inner error's status code, error code, and mess
 }
 ```
 
-### Key Features
+### Benefits of Nested Responses
 
 - **Status Code Preservation**: Nested errors maintain their original HTTP status codes
 - **Error Code Forwarding**: Custom error codes from inner errors are preserved
 - **Multiple Nesting Levels**: Supports arbitrarily deep error nesting
 - **Automatic Conversion**: Use `#[from]` attribute for automatic error conversion
 - **Consistent JSON Format**: All responses follow the same `{"result": null, "error": {...}}` structure
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Repository
+
+Find this project on GitHub: [axum-error-handler](https://github.com/MRDavidYen/axum-error-handler)
