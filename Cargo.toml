@@ -1,5 +1,5 @@
 [workspace]
-members = ["err_ctx", "err_macro"]
+members = ["err-ctx", "err-macro"]
 
 [package]
 name = "axum-error-handler"
@@ -13,8 +13,8 @@ categories = ["web-programming"]
 keywords = ["axum", "error", "handler", "web", "framework"]
 
 [dependencies]
-err_ctx = { version = "0.1.0", path = "err_ctx" }
-err_macro = { version = "0.2.1", path = "err_macro" }
+err-ctx = { version = "0.1.0", path = "err-ctx" }
+err-macro = { version = "0.2.1", path = "err-macro" }
 
 [dev-dependencies]
 tokio = { version = "1.45.1", features = ["full"] }
