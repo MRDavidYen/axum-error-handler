@@ -78,14 +78,30 @@ dependencies = [
 ]
 
 [[package]]
-name = "axum-error-handler"
-version = "0.2.0"
+name = "axum-err-handler-ctx"
+version = "0.1.0"
 dependencies = [
  "axum",
+ "serde_json",
+]
+
+[[package]]
+name = "axum-err-handler-macro"
+version = "0.2.1"
+dependencies = [
  "proc-macro2",
  "quote",
- "serde_json",
  "syn",
+]
+
+[[package]]
+name = "axum-error-handler"
+version = "0.2.1"
+dependencies = [
+ "axum",
+ "axum-err-handler-ctx",
+ "axum-err-handler-macro",
+ "serde_json",
  "thiserror",
  "tokio",
 ]

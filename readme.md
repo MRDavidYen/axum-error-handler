@@ -1,74 +1,37 @@
 # Axum Error Handler
 
-A simple parser that implemented Axum `IntoResponse` trait.
+[![Crates.io](https://img.shields.io/crates/v/axum-error-handler.svg)](https://crates.io/crates/axum-error-handler)
+[![Documentation](https://docs.rs/axum-error-handler/badge.svg)](https://docs.rs/axum-error-handler)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> Please notice that this is a experimental project.
-> This proc-macros depends on `axum`, `thiserror` and `serde_json` crates. 
+A procedural macro for generating standardized error responses in Axum applications. This crate provides a derive macro that automatically implements the `IntoResponse` trait for your error enums, creating consistent JSON error responses with proper HTTP status codes.
 
-## Next feature
+## Features
 
-- [ ] Allow Custom function for define own output format.
+- 🚀 **Easy Integration**: Simple derive macro for error enums
+- 📝 **Consistent Format**: Standardized JSON error responses
+- 🔧 **Flexible Configuration**: Custom status codes and error codes
+- 🏗️ **Nested Error Support**: Forward inner errors with preserved status codes
+- 🎨 **Custom Response Functions**: Use custom functions for specialized error handling
+- ⚡ **Zero Runtime Cost**: All code generation happens at compile time
 
-> This is an example:
-```rust
-#[derive(Debug, Error, AxumErrorResponse)]
-#[response(custom_fn = "your_custom_fn")]
-pub enum TestError {
-    #[error("Bad request: {0}")]
-    #[status_code("400")]
-    #[code("BAD_REQUEST")]
-    BadRequest(String),
-    
-    #[error("Internal server error {0}")]
-    #[status_code("500")]
-    #[code("INTERNAL_SERVER_ERROR")]
-    InternalError(String),
-}
+> **Note**: This is an experimental project. The API may change in future versions.
 
-fn your_custom_fn(status_code: StatusCode, code: &str, msg: &str) -> Response {
-    // implement your own response format
-}
-```
+## Installation
 
-This feature should launch on the next version.
+Add this to your `Cargo.toml`:
 
-## Basic Usage
+```toml
+[dependencies]
+axum-error-handler = "0.2.1"
+axum = "0.8"
+thiserror = "2.0"
+serde_json = "1.0"
+``` 
 
-```rust
-use axum_error_handler::AxumErrorResponse;
-use thiserror::Error;
+## Usage Examples
 
-#[derive(Debug, Error, AxumErrorResponse)]
-pub enum TestError {
-    #[error("Bad request: {0}")]
-    #[status_code("400")]
-    #[code("BAD_REQUEST")]
-    BadRequest(String),
-    
-    #[error("Internal server error {0}")]
-    #[status_code("500")]
-    #[code("INTERNAL_SERVER_ERROR")]
-    InternalError(String),
-}
-```
-
-### Basic Output
-
-```json
-{
-  "result": null,
-  "error": {
-    "code": "BAD_REQUEST",
-    "message": "Bad request: invalid input"
-  }
-}
-```
-
-## Nested Response Support
-
-The library supports nested error handling through the `#[response(nested)]` attribute. This allows inner errors that also implement `AxumErrorResponse` to be properly forwarded with their own status codes and error details.
-
-### Example
+### Basic Error Responses
 
 ```rust
 use axum_error_handler::AxumErrorResponse;
@@ -81,7 +44,36 @@ pub enum AppError {
     #[code("BAD_REQUEST")]
     BadRequest(String),
     
-    // Use nested response to delegate to inner error's response
+    #[error("Internal server error {0}")]
+    #[status_code("500")]
+    #[code("INTERNAL_SERVER_ERROR")]
+    InternalError(String),
+}
+```
+
+Generates JSON responses like:
+```json
+{
+  "result": null,
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Bad request: invalid input"
+  }
+}
+```
+
+### Nested Error Responses
+
+Use `#[response(nested)]` to delegate to inner error responses:
+
+```rust
+#[derive(Debug, Error, AxumErrorResponse)]
+pub enum AppError {
+    #[error("Bad request: {0}")]
+    #[status_code("400")]
+    #[code("BAD_REQUEST")]
+    BadRequest(String),
+    
     #[error("{0}")]
     #[response(nested)]
     ServiceError(#[from] ServiceError),
@@ -93,66 +85,46 @@ pub enum ServiceError {
     #[status_code("401")]
     #[code("AUTHENTICATION_ERROR")]
     AuthenticationError(String),
-    
-    #[error("Database connection failed: {0}")]
-    #[status_code("503")]
-    #[code("DATABASE_ERROR")]
-    DatabaseError(String),
-    
-    // Supports multiple levels of nesting
-    #[error("{0}")]
-    #[response(nested)]
-    ValidationError(#[from] ValidationError),
+}
+```
+
+### Custom Error Response Functions
+
+For specialized error handling, use custom response functions:
+
+```rust
+use axum_error_handler::{AxumErrorResponse, ErrorResponseContext};
+use axum::{response::Response, http::StatusCode};
+
+// Custom response function
+fn custom_error_response(_ctx: ErrorResponseContext) -> Response {
+    Response::builder()
+        .status(StatusCode::INTERNAL_SERVER_ERROR)
+        .body(axum::body::Body::from("Custom error format"))
+        .unwrap()
 }
 
 #[derive(Debug, Error, AxumErrorResponse)]
-pub enum ValidationError {
-    #[error("Validation failed: {0}")]
-    #[status_code("422")]
-    #[code("VALIDATION_ERROR")]
-    FieldValidation(String),
+#[response(custom_fn = "custom_error_response")]
+pub enum CustomError {
+    #[error("Database error: {0}")]
+    DatabaseError(String),
     
-    #[error("Permission denied: {0}")]
-    #[status_code("403")]
-    #[code("PERMISSION_DENIED")]
-    PermissionDenied(String),
+    #[error("Validation error: {0}")]
+    ValidationError(String),
 }
 ```
 
-### Usage
+This allows you to return any response format (plain text, XML, custom JSON, etc.) instead of the standard JSON format.
 
-```rust
-// Direct error
-let err = AppError::BadRequest("missing field".to_string());
+## Contributing
 
-// Nested error - preserves inner error's status code and details
-let service_err = ServiceError::AuthenticationError("invalid token".to_string());
-let app_err = AppError::ServiceError(service_err);
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
-// Multi-level nesting
-let validation_err = ValidationError::FieldValidation("email format invalid".to_string());
-let service_err = ServiceError::ValidationError(validation_err);
-let app_err = AppError::ServiceError(service_err);
-```
+## License
 
-### Nested Response Output
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-When using nested responses, the inner error's status code, error code, and message are preserved:
+## Repository
 
-```json
-{
-  "result": null,
-  "error": {
-    "code": "AUTHENTICATION_ERROR",
-    "message": "Authentication error: invalid token"
-  }
-}
-```
-
-### Key Features
-
-- **Status Code Preservation**: Nested errors maintain their original HTTP status codes
-- **Error Code Forwarding**: Custom error codes from inner errors are preserved
-- **Multiple Nesting Levels**: Supports arbitrarily deep error nesting
-- **Automatic Conversion**: Use `#[from]` attribute for automatic error conversion
-- **Consistent JSON Format**: All responses follow the same `{"result": null, "error": {...}}` structure
+Find this project on GitHub: [axum-error-handler](https://github.com/MRDavidYen/axum-error-handler)
