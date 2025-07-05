@@ -82,10 +82,9 @@ name = "axum-error-handler"
 version = "0.2.1"
 dependencies = [
  "axum",
- "proc-macro2",
- "quote",
+ "err_ctx",
+ "err_macro",
  "serde_json",
- "syn",
  "thiserror",
  "tokio",
 ]
@@ -122,6 +121,23 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "err_ctx"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "serde_json",
+]
+
+[[package]]
+name = "err_macro"
+version = "0.2.1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "fnv"

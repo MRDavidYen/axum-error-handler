@@ -1,9 +1,9 @@
 use crate::ParseStream;
+use quote::quote;
 use syn::Fields;
 use syn::{Attribute, LitStr};
-use quote::quote;
 
-pub fn parse_general_response(
+pub fn parse_general_response_context(
     name: &syn::Ident,
     variant: &syn::Variant,
 ) -> proc_macro2::TokenStream {
@@ -13,7 +13,7 @@ pub fn parse_general_response(
         .attrs
         .iter()
         .find_map(|attr| parse_status_code(attr))
-        .unwrap_or(quote! { axum::http::StatusCode::INTERNAL_SERVER_ERROR });
+        .unwrap_or(quote! { 500 });
     let code = variant
         .attrs
         .iter()
@@ -42,20 +42,11 @@ pub fn parse_general_response(
 
     quote! {
         #pattern => {
-            let body = #body;
-            let json = axum::Json(serde_json::json!({
-                "result": null,
-                "error": {
-                    "code": #code,
-                    "message": body,
-                }
-            }));
-
-            axum::http::Response::builder()
-                .status(#status_code)
-                .header("content-type", "application/json")
-                .body(json.into_response().into_body())
-                .unwrap()
+            axum_error_handler::ErrorResponseContext::builder()
+                .status_code(#status_code)
+                .code(#code.to_string())
+                .message(#body)
+                .build()
         }
     }
 }
@@ -67,12 +58,12 @@ fn parse_status_code(attr: &Attribute) -> Option<proc_macro2::TokenStream> {
 
             let val = fmt.value();
 
-            Ok(quote! { axum::http::StatusCode::from_u16(#val.parse().unwrap()).unwrap() })
+            Ok(quote! { #val.parse().unwrap_or(500) })
         });
 
         if result.is_err() {
             println!("Error parsing status code");
-            return Some(quote! { axum::http::StatusCode::INTERNAL_SERVER_ERROR });
+            return Some(quote! { 500 });
         }
 
         Some(result.unwrap())

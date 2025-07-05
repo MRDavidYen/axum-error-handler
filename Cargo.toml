@@ -1,3 +1,10 @@
+[workspace]
+members = ["err_ctx", "err_macro"]
+
+[workspace.dependencies]
+err_ctx = { path = "err_ctx" }
+err_macro = { path = "err_macro" }
+
 [package]
 name = "axum-error-handler"
 version = "0.2.1"
@@ -9,16 +16,12 @@ repository = "https://github.com/MRDavidYen/axum-error-handler"
 categories = ["web-programming"]
 keywords = ["axum", "error", "handler", "web", "framework"]
 
-[lib]
-proc-macro = true
-
 [dependencies]
-syn = { version = "2.0.101", features = ["full"] }
-quote = "1.0.40"
-proc-macro2 = "1.0.87"
+err_ctx.workspace = true
+err_macro.workspace = true
 
 [dev-dependencies]
 tokio = { version = "1.45.1", features = ["full"] }
-axum = "0.8.4"
 thiserror = "2.0.12"
-serde_json = "1.0.140"
+axum = "0.8"
+serde_json = "1.0"

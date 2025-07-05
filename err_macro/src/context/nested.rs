@@ -1,6 +1,6 @@
 use quote::quote;
 
-pub fn parse_nested_response(
+pub fn parse_nested_response_context(
     name: &syn::Ident,
     variant: &syn::Variant,
 ) -> proc_macro2::TokenStream {
@@ -26,7 +26,7 @@ pub fn parse_nested_response(
             panic!("Named fields are not supported in enum variants for nested response parsing")
         }
         syn::Fields::Unnamed(_) => {
-            quote! { inner.into_response() }
+            quote! { inner.into_response_context() }
         }
     };
 
