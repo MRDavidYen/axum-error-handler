@@ -2,8 +2,8 @@
 members = ["err_ctx", "err_macro"]
 
 [workspace.dependencies]
-err_ctx = { path = "err_ctx" }
-err_macro = { path = "err_macro" }
+err_ctx = { version = "0.1.0", path = "err_ctx" }
+err_macro = { version = "0.2.1", path = "err_macro" }
 
 [package]
 name = "axum-error-handler"
